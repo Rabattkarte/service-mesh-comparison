@@ -1,15 +1,10 @@
 #!/bin/bash
 set -x
 
-# Check for all necessary tools
-for tool in minikube \
-  cilium \
-  helm; do
-  if ! command -v $tool &>/dev/null; then
-    printf "'%s' could not be found. Aborting.\n" "$tool"
-    exit
-  fi
-done
+# Source common lib
+. ./_common.sh
+
+check_tools minikube cilium helm
 
 # Variables
 MK_PROFILE_NAME="${MK_PROFILE_NAME:-cilium-kube}"
@@ -76,24 +71,11 @@ done
 # Wait for cilium to be up and running
 cilium status --wait
 
-# kubectl -n kube-system get pods --watch
-# sleep 60
-
 # Restart all pods not yet managed by Cilium
-(
-  IFS=$'\n'
-  PODS_TO_RESTART=$(kubectl get pods --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork --no-headers=true |
-    grep '<none>' |
-    awk '{print "-n "$1" "$2}')
-
-  for pod in $PODS_TO_RESTART; do
-    cmd="kubectl delete pod $pod"
-    eval "$cmd"
-  done
-)
-
-#  |
-# xargs -L 1 -r kubectl delete pod
-
-printf "Exporting 'MINIKUBE_PROFILE=%s\n'" "$MK_PROFILE_NAME"
-export MINIKUBE_PROFILE="$MK_PROFILE_NAME"
+kubectl get pods \
+  --all-namespaces \
+  --output custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork \
+  --no-headers=true |
+  grep '<none>' |
+  awk '{print "-n "$1" "$2}' |
+  xargs -L 1 -r kubectl delete pod
