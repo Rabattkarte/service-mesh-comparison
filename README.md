@@ -2,11 +2,13 @@
 
 ## Prerequisites
 
-- minikube
-- Docker driver for minikube must be enabled
-- cilium >= v1.12.0
-- `cilium-cli`
+- `Docker Desktop`
+- `minikube`
+  - Docker driver for minikube must be enabled
+- `cilium` >= v1.12.0
 - `helm` >= 3.0.0
+- `cilium-cli`
+- `hubble-cli`
 
 ## Setup Cilium Service Mesh in `minikube`
 
@@ -17,60 +19,10 @@ We are following the `latest` docs:
 
 Let's go.
 
-1. Create a new minikube profile
+1. Start Docker Desktop.
+1. Make **docker** the default driver for **minikube**: `minikube config set driver docker`.
+1. Execute [00_install_cilium_in_minikube.sh](./00_install_cilium_in_minikube.sh) to provision a minikube profile with Cilium CNI / Service Mesh / Hubble.
 
    ```sh
-   minikube start \
-     --network-plugin=cni \
-     --cni=false \
-     --addons=metrics-server \
-     --profile='service-mesh-cilium2'
-   ```
-
-   and enable the `metrics-server` addon
-
-   ```sh
-   minikube addons enable metrics-server -p service-mesh-cilium
-   ```
-
-   and ensure, that you are connecting to the right context:
-
-   ```sh
-   kubectl config current-context
-   ```
-
-1. Add Cilium's Helm repo and install a **version >= v1.12.0**
-
-   ```sh
-   helm repo add cilium https://helm.cilium.io/
-   helm repo update cilium
-   ```
-
-   ```sh
-   helm upgrade \
-     --install cilium cilium/cilium \
-     --version 1.12.0-rc3 \
-     --set operator.replicas=1 \
-     --namespace=kube-system
-   ```
-
-1. Restart all unmanaged pods
-
-   ```sh
-   kubectl get pods --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork --no-headers=true | grep '<none>' | awk '{print "-n "$1" "$2}' | xargs -L 1 -r kubectl delete pod
-   ```
-
-1. Validate installation
-
-   ```sh
-   # kubectl -n kube-system get pods --watch
-   kubectl create ns cilium-test
-   kubectl apply -n cilium-test -f https://raw.githubusercontent.com/cilium/cilium/HEAD/examples/kubernetes/connectivity-check/connectivity-check.yaml
-   kubectl get pods -n cilium-test # everything should be in state "Running"
-   ```
-
-   If everything runs, let's clean up again by removing the namespace.
-
-   ```sh
-   kubectl delete ns cilium-test
+   ./00_install_cilium_in_minikube.sh
    ```
