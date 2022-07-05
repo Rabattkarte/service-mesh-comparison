@@ -49,17 +49,19 @@ minikube image load \
 # https://docs.cilium.io/en/latest/gettingstarted/host-services/#host-services
 # & replace kube-proxy with Cilium
 # https://docs.cilium.io/en/latest/gettingstarted/kubeproxy-free/
+# & enable Ingress support
+# https://docs.cilium.io/en/latest/gettingstarted/servicemesh/ingress/
 helm upgrade \
   --install cilium cilium/cilium \
   --version "$CILIUM_VERSION" \
-  --set operator.replicas=1 \
+  --set hostServices.enabled=true \
   --set hubble.relay.enabled=true \
   --set hubble.ui.enabled=true \
-  --set hostServices.enabled=true \
-  --set kubeProxyReplacement=strict \
   --set ingressController.enabled=true \
   --set k8sServiceHost="$API_SERVER_IP" \
   --set k8sServicePort="$API_SERVER_PORT" \
+  --set kubeProxyReplacement=strict \
+  --set operator.replicas=1 \
   --namespace=kube-system \
   --wait \
   --wait-for-jobs
