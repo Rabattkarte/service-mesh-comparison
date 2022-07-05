@@ -24,7 +24,7 @@ minikube start \
   --apiserver-port="$API_SERVER_PORT" \
   --profile="$MK_PROFILE_NAME"
 
-# Set minikube profile to the just create profile
+# Set minikube profile to the just created profile
 minikube profile "$MK_PROFILE_NAME"
 
 # Grab API server's IP address
@@ -57,6 +57,7 @@ helm upgrade \
   --set hubble.ui.enabled=true \
   --set hostServices.enabled=true \
   --set kubeProxyReplacement=strict \
+  --set ingressController.enabled=true \
   --set k8sServiceHost="$API_SERVER_IP" \
   --set k8sServicePort="$API_SERVER_PORT" \
   --namespace=kube-system \
