@@ -8,7 +8,7 @@ check_tools minikube cilium helm
 
 # Variables
 MK_PROFILE_NAME="${MK_PROFILE_NAME:-cilium-kube}"
-MK_MEMORY="${MK_MEMORY:-2g}"
+MK_MEMORY="${MK_MEMORY:-3g}"
 API_SERVER_PORT="8443"
 CILIUM_HELM_REPO="https://helm.cilium.io/"
 CILIUM_VERSION="1.12.0-rc3"
