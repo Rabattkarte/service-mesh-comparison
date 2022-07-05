@@ -19,7 +19,7 @@ minikube start \
   --network-plugin="cni" \
   --cni="false" \
   --extra-config="kubeadm.skip-phases=addon/kube-proxy" \
-  --addons="metrics-server,metallb" \
+  --addons="metrics-server" \
   --memory="$MK_MEMORY" \
   --apiserver-port="$API_SERVER_PORT" \
   --profile="$MK_PROFILE_NAME"
